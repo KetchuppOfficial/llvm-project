@@ -3,15 +3,24 @@
 
 #include "llvm/ADT/StringRef.h"
 #include "llvm/CodeGen/TargetPassConfig.h"
-#include "llvm/MC/TargetRegistry.h"
-#include "llvm/Support/CodeGen.h"
-#include "llvm/Target/TargetLoweringObjectFile.h"
+#include "llvm/Support/CodeGen.h" // for Reloc, CodeModel, CodeGenOptLevel
 #include "llvm/Target/TargetMachine.h"
 
 #include <memory>
 #include <optional>
 
 namespace llvm {
+
+class Target;
+class TargetOptions;
+class Triple;
+class TargetLoweringObjectFile;
+
+namespace legacy {
+
+class PassManagerBase;
+
+} // end namespace legacy
 
 extern Target TheDAArch34Target;
 
