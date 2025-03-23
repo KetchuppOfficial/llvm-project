@@ -80,6 +80,7 @@ StringRef Triple::getArchTypeName(ArchType Kind) {
   case thumb:          return "thumb";
   case thumbeb:        return "thumbeb";
   case ve:             return "ve";
+  case daarch34:       return "daarch34";
   case wasm32:         return "wasm32";
   case wasm64:         return "wasm64";
   case x86:            return "i386";
@@ -233,6 +234,8 @@ StringRef Triple::getArchTypePrefix(ArchType Kind) {
   case dxil:        return "dx";
 
   case xtensa:      return "xtensa";
+
+  case daarch34:    return "daarch34";
   }
 }
 
@@ -461,6 +464,7 @@ Triple::ArchType Triple::getArchTypeForLLVMName(StringRef Name) {
     .Case("loongarch64", loongarch64)
     .Case("dxil", dxil)
     .Case("xtensa", xtensa)
+    .Case("daarch34", daarch34)
     .Default(UnknownArch);
 }
 
@@ -609,6 +613,7 @@ static Triple::ArchType parseArch(StringRef ArchName) {
                  "dxilv1.4", "dxilv1.5", "dxilv1.6", "dxilv1.7", "dxilv1.8",
                  Triple::dxil)
           .Case("xtensa", Triple::xtensa)
+          .Case("daarch34", Triple::daarch34)
           .Default(Triple::UnknownArch);
 
   // Some architectures require special parsing logic just to compute the
@@ -945,6 +950,7 @@ static Triple::ObjectFormatType getDefaultFormat(const Triple &T) {
   case Triple::ve:
   case Triple::xcore:
   case Triple::xtensa:
+  case Triple::daarch34:
     return Triple::ELF;
 
   case Triple::ppc64:
@@ -1636,6 +1642,7 @@ unsigned Triple::getArchPointerBitWidth(llvm::Triple::ArchType Arch) {
   case llvm::Triple::x86:
   case llvm::Triple::xcore:
   case llvm::Triple::xtensa:
+  case llvm::Triple::daarch34:
     return 32;
 
   case llvm::Triple::aarch64:
@@ -1728,6 +1735,7 @@ Triple Triple::get32BitArchVariant() const {
   case Triple::x86:
   case Triple::xcore:
   case Triple::xtensa:
+  case Triple::daarch34:
     // Already 32-bit.
     break;
 
@@ -1806,6 +1814,7 @@ Triple Triple::get64BitArchVariant() const {
   case Triple::ve:
   case Triple::wasm64:
   case Triple::x86_64:
+  case Triple::daarch34:
     // Already 64-bit.
     break;
 
@@ -1883,6 +1892,7 @@ Triple Triple::getBigEndianArchVariant() const {
   case Triple::ve:
   case Triple::csky:
   case Triple::xtensa:
+  case Triple::daarch34:
 
   // ARM is intentionally unsupported here, changing the architecture would
   // drop any arch suffixes.
@@ -1994,6 +2004,7 @@ bool Triple::isLittleEndian() const {
   case Triple::x86_64:
   case Triple::xcore:
   case Triple::xtensa:
+  case Triple::daarch34:
     return true;
   default:
     return false;
