@@ -1,5 +1,6 @@
 add_llvm_component_library(LLVMDAArch34Desc
     DAArch34MCTargetDesc.cpp
+    DAArch34MCAsmInfo.cpp
 
 LINK_COMPONENTS
     MC
