@@ -1,7 +1,9 @@
+#include "llvm/MC/MCDwarf.h"
 #include "llvm/MC/MCInstrInfo.h"
 #include "llvm/MC/MCRegisterInfo.h"
 #include "llvm/MC/TargetRegistry.h"
 
+#include "DAArch34MCAsmInfo.h"
 #include "TargetInfo/DAArch34TargetInfo.h"
 
 #define GET_REGINFO_ENUM    // for enum of registers
@@ -38,6 +40,14 @@ MCSubtargetInfo *createDAArch34MCSubtargetInfo(const Triple &TT, StringRef CPU,
   return createDAArch34MCSubtargetInfoImpl(TT, CPU, CPU /* TuneCPU */, FS);
 }
 
+MCAsmInfo *createDAArch34MCAsmInfo(const MCRegisterInfo &MRI, const Triple &TT,
+                                   const MCTargetOptions &Options) {
+  MCAsmInfo *MAI = new DAArch34ELFMCAsmInfo(TT);
+  unsigned SP = MRI.getDwarfRegNum(DAArch34::D2, true /* isEH */);
+  MAI->addInitialFrameState(MCCFIInstruction::cfiDefCfa(nullptr, SP, 0));
+  return MAI;
+}
+
 } // end unnamed namespace
 
 extern "C" void LLVMInitializeDAArch34TargetMC() {
@@ -48,6 +58,7 @@ extern "C" void LLVMInitializeDAArch34TargetMC() {
                                       createDAArch34MCInstrInfo);
   TargetRegistry::RegisterMCSubtargetInfo(TheDAArch34Target,
                                           createDAArch34MCSubtargetInfo);
+  TargetRegistry::RegisterMCAsmInfo(TheDAArch34Target, createDAArch34MCAsmInfo);
 }
 
 } // end namespace llvm
