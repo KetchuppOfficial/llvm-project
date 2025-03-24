@@ -12,6 +12,11 @@
 #define GET_INSTRINFO_MC_DESC          // for InitDAArch34MCInstrInfo
 #include "DAArch34GenInstrInfo.inc"
 
+#include "llvm/MC/MCInst.h"
+#include "llvm/MC/MCSubtargetInfo.h"
+#define GET_SUBTARGETINFO_MC_DESC // for createDAArch34MCSubtargetInfoImpl
+#include "DAArch34GenSubtargetInfo.inc"
+
 namespace llvm {
 
 namespace {
@@ -28,6 +33,11 @@ MCInstrInfo *createDAArch34MCInstrInfo() {
   return X;
 }
 
+MCSubtargetInfo *createDAArch34MCSubtargetInfo(const Triple &TT, StringRef CPU,
+                                               StringRef FS) {
+  return createDAArch34MCSubtargetInfoImpl(TT, CPU, CPU /* TuneCPU */, FS);
+}
+
 } // end unnamed namespace
 
 extern "C" void LLVMInitializeDAArch34TargetMC() {
@@ -36,6 +46,8 @@ extern "C" void LLVMInitializeDAArch34TargetMC() {
                                     createDAArch34MCRegisterInfo);
   TargetRegistry::RegisterMCInstrInfo(TheDAArch34Target,
                                       createDAArch34MCInstrInfo);
+  TargetRegistry::RegisterMCSubtargetInfo(TheDAArch34Target,
+                                          createDAArch34MCSubtargetInfo);
 }
 
 } // end namespace llvm
