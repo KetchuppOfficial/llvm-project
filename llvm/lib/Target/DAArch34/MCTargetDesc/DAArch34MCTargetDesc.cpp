@@ -3,6 +3,7 @@
 #include "llvm/MC/MCRegisterInfo.h"
 #include "llvm/MC/TargetRegistry.h"
 
+#include "DAArch34InstPrinter.h"
 #include "DAArch34MCAsmInfo.h"
 #include "TargetInfo/DAArch34TargetInfo.h"
 
@@ -48,6 +49,14 @@ MCAsmInfo *createDAArch34MCAsmInfo(const MCRegisterInfo &MRI, const Triple &TT,
   return MAI;
 }
 
+MCInstPrinter *createDAArch34MCInstPrinter(const Triple &TT,
+                                           unsigned SyntaxVariant,
+                                           const MCAsmInfo &MAI,
+                                           const MCInstrInfo &MII,
+                                           const MCRegisterInfo &MRI) {
+  return new DAArch34InstrPrinter(MAI, MII, MRI);
+}
+
 } // end unnamed namespace
 
 extern "C" void LLVMInitializeDAArch34TargetMC() {
@@ -59,6 +68,7 @@ extern "C" void LLVMInitializeDAArch34TargetMC() {
   TargetRegistry::RegisterMCSubtargetInfo(TheDAArch34Target,
                                           createDAArch34MCSubtargetInfo);
   TargetRegistry::RegisterMCAsmInfo(TheDAArch34Target, createDAArch34MCAsmInfo);
+  TargetRegistry::RegisterMCInstPrinter(TheDAArch34Target, createDAArch34MCInstPrinter);
 }
 
 } // end namespace llvm
