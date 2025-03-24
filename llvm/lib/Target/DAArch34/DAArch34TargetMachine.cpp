@@ -2,6 +2,7 @@
 #include "TargetInfo/DAArch34TargetInfo.h"
 
 #include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
+#include "llvm/CodeGen/TargetPassConfig.h"
 #include "llvm/MC/TargetRegistry.h" // for RegisterTargetMachine
 
 #include <optional>
@@ -32,6 +33,24 @@ DAArch34TargetMachine::DAArch34TargetMachine(const Target &T, const Triple &TT,
                         getEffectiveCodeModel(CM, CodeModel::Small), OL),
       TLOF(std::make_unique<TargetLoweringObjectFileELF>()) {
   initAsmInfo();
+}
+
+namespace {
+
+class DAArch34PassConfig : public TargetPassConfig {
+public:
+  DAArch34PassConfig(DAArch34TargetMachine &TM, PassManagerBase &PM)
+      : TargetPassConfig(TM, PM) {}
+
+  /// addInstSelector - This method should install an instruction selector pass,
+  /// which converts from LLVM code to machine instructions.
+  bool addInstSelector() override { return false; }
+};
+
+} // end unnamed namespace
+
+TargetPassConfig *DAArch34TargetMachine::createPassConfig(PassManagerBase &PM) {
+  return new DAArch34PassConfig(*this, PM);
 }
 
 } // end namespace llvm

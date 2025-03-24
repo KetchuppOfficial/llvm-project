@@ -32,9 +32,9 @@ public:
                         std::optional<CodeModel::Model> CM, CodeGenOptLevel OL,
                         bool JIT, bool LittleEndian = true);
 
-  TargetPassConfig *createPassConfig(legacy::PassManagerBase &PM) override {
-    return new TargetPassConfig(*this, PM);
-  }
+  /// Create a pass configuration object to be used by addPassToEmitX methods
+  /// for generating a pipeline of CodeGen passes.
+  TargetPassConfig *createPassConfig(legacy::PassManagerBase &PM) override;
 
   TargetLoweringObjectFile *getObjFileLowering() const override {
     return TLOF.get();
