@@ -1,7 +1,7 @@
 #ifndef DAARCH_REGISTER_INFO_TD
 #define DAARCH_REGISTER_INFO_TD
 
-include "llvm/Target/Target.td"
+// include "llvm/Target/Target.td" before this file
 
 class DAArch34Reg<bits<5> Enc, string N> : Register<N> {
     let HWEncoding{4-0} = Enc;
