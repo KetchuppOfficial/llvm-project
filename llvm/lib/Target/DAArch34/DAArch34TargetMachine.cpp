@@ -35,6 +35,9 @@ DAArch34TargetMachine::DAArch34TargetMachine(const Target &T, const Triple &TT,
   initAsmInfo();
 }
 
+FunctionPass *createDAArch34ISelDag(DAArch34TargetMachine &TM,
+                                    CodeGenOptLevel OptLevel);
+
 namespace {
 
 class DAArch34PassConfig : public TargetPassConfig {
@@ -42,9 +45,16 @@ public:
   DAArch34PassConfig(DAArch34TargetMachine &TM, PassManagerBase &PM)
       : TargetPassConfig(TM, PM) {}
 
+  DAArch34TargetMachine &getDAArch34TargetMachine() const {
+    return getTM<DAArch34TargetMachine>();
+  }
+
   /// addInstSelector - This method should install an instruction selector pass,
   /// which converts from LLVM code to machine instructions.
-  bool addInstSelector() override { return false; }
+  bool addInstSelector() override {
+    addPass(createDAArch34ISelDag(getDAArch34TargetMachine(), getOptLevel()));
+    return false;
+  }
 };
 
 } // end unnamed namespace
