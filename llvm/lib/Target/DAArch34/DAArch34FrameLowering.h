@@ -7,11 +7,12 @@
 namespace llvm {
 
 class MachineBasicBlock;
+class DAArch34Subtarget;
 
 class DAArch34FrameLowering : public TargetFrameLowering {
 public:
-  explicit DAArch34FrameLowering()
-      : TargetFrameLowering(TargetFrameLowering::StackGrowsDown, Align{4}, 0) {}
+  explicit DAArch34FrameLowering(const DAArch34Subtarget &STI)
+      : TargetFrameLowering(TargetFrameLowering::StackGrowsDown, Align{4}, 0), STI(STI) {}
 
   void emitPrologue(MachineFunction &MF,
                     MachineBasicBlock &MBB) const override {}
@@ -19,6 +20,9 @@ public:
                     MachineBasicBlock &MBB) const override {}
 
   bool hasFP(const MachineFunction &MF) const override { return false; }
+
+private:
+  const DAArch34Subtarget &STI;
 };
 
 } // end namespace llvm

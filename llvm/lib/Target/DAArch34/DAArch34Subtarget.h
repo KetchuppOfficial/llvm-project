@@ -5,6 +5,7 @@
 
 #include "llvm/ADT/StringRef.h"
 
+#include "DAArch34FrameLowering.h"
 #include "DAArch34ISelLowering.h"
 
 #define GET_SUBTARGETINFO_HEADER // for DAArch34GenSubtargetInfo
@@ -28,8 +29,13 @@ public:
     return &TLInfo;
   }
 
+  const DAArch34FrameLowering *getFrameLowering() const override {
+    return &FrameLowering;
+  }
+
 private:
   DAArch34TargetLowering TLInfo;
+  DAArch34FrameLowering FrameLowering;
 };
 
 } // end namespace llvm
