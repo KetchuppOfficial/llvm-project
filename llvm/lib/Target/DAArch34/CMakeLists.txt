@@ -15,6 +15,7 @@ add_llvm_target(DAArch34CodeGen
     DAArch34Subtarget.cpp
     DAArch34AsmPrinter.cpp
     DAArch34ISelDagToDag.cpp
+    DAArch34ISelLowering.cpp
 
 LINK_COMPONENTS
     CodeGen

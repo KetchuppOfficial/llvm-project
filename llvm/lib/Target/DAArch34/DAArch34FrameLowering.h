@@ -8,9 +8,9 @@ namespace llvm {
 
 class MachineBasicBlock;
 
-class DAARch34FrameLowering : public TargetFrameLowering {
+class DAArch34FrameLowering : public TargetFrameLowering {
 public:
-  explicit DAARch34FrameLowering()
+  explicit DAArch34FrameLowering()
       : TargetFrameLowering(TargetFrameLowering::StackGrowsDown, Align{4}, 0) {}
 
   void emitPrologue(MachineFunction &MF,
