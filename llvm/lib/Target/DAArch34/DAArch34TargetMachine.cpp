@@ -31,7 +31,8 @@ DAArch34TargetMachine::DAArch34TargetMachine(const Target &T, const Triple &TT,
     : LLVMTargetMachine(T, "e-m:e-p:32:32-i8:8:32-i16:16:32-i64:64-n32", TT,
                         CPU, FS, Options, getEffectiveRelocModel(JIT, RM),
                         getEffectiveCodeModel(CM, CodeModel::Small), OL),
-      TLOF(std::make_unique<TargetLoweringObjectFileELF>()) {
+      TLOF(std::make_unique<TargetLoweringObjectFileELF>()),
+      Subtarget(*this, TT, CPU.str(), FS.str()) {
   initAsmInfo();
 }
 

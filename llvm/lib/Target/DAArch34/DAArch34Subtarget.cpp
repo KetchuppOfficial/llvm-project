@@ -8,10 +8,11 @@
 
 namespace llvm {
 
-DAArch34Subtarget::DAArch34Subtarget(const TargetMachine &TM, StringRef CPU,
-                                     StringRef TuneCPU, StringRef FS)
-    : DAArch34GenSubtargetInfo(TM.getTargetTriple(), CPU, TuneCPU, FS) {}
+DAArch34Subtarget::DAArch34Subtarget(const TargetMachine &TM, const Triple &TT,
+                                     const std::string &CPU,
+                                     const std::string &FS)
+    : DAArch34GenSubtargetInfo(TT, CPU, CPU /* TunCPU */, FS),
+      TLInfo(TM, *this) {}
 
-// No implementation of DAArch34Subtarget::ParseSubtargetFeatures for now
 
 } // end namespace llvm
