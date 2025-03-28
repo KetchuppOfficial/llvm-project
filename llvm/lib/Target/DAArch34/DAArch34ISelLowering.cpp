@@ -1,4 +1,5 @@
 #include "llvm/CodeGen/CallingConvLower.h"
+#include "llvm/CodeGen/ISDOpcodes.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
 #include "llvm/CodeGen/SelectionDAGNodes.h"
 #include "llvm/CodeGen/ValueTypes.h"
@@ -23,6 +24,24 @@ DAArch34TargetLowering::DAArch34TargetLowering(const TargetMachine &TM,
                                                const DAArch34Subtarget &STI)
     : TargetLowering(TM), STI(STI) {
   addRegisterClass(MVT::i32, &DAArch34::GPRRegClass);
+
+  computeRegisterProperties(STI.getRegisterInfo());
+
+  setStackPointerRegisterToSaveRestore(DAArch34::D2);
+
+  for (unsigned Opc = 0; Opc != ISD::NodeType::BUILTIN_OP_END; ++Opc) {
+    // Try to expand this to other ops, otherwise use a libcall.
+    setOperationAction(Opc, MVT::i32, LegalizeAction::Expand);
+  }
+
+  for (auto Op : {ISD::ADD, ISD::MUL, ISD::LOAD, ISD::STORE, ISD::Constant,
+                  ISD::UNDEF, ISD::FRAMEADDR}) {
+    // The target natively supports this operation.
+    setOperationAction(Op, MVT::i32, LegalizeAction::Legal);
+  }
+
+  // Use the LowerOperation hook to implement custom lowering.
+  setOperationAction(ISD::BR_CC, MVT::i32, LegalizeAction::Custom);
 }
 
 const char *DAArch34TargetLowering::getTargetNodeName(unsigned Opcode) const {
@@ -471,8 +490,8 @@ DAArch34TargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
     assert(VA.isRegLoc() && "Can only return in registers!");
 
     const Register LocReg = VA.getLocReg();
-    Chain = DAG.getCopyToReg(Chain, DL, LocReg,
-                             convertValVTToLocVT(DAG, OutVals[I], VA, DL), Glue);
+    Chain = DAG.getCopyToReg(
+        Chain, DL, LocReg, convertValVTToLocVT(DAG, OutVals[I], VA, DL), Glue);
 
     // Guarantee that all emitted copies are stuck together.
     Glue = Chain.getValue(1);
