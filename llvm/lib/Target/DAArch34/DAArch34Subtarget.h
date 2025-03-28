@@ -7,6 +7,7 @@
 
 #include "DAArch34FrameLowering.h"
 #include "DAArch34ISelLowering.h"
+#include "DAArch34RegisterInfo.h"
 
 #define GET_SUBTARGETINFO_HEADER // for DAArch34GenSubtargetInfo
 #include "DAArch34GenSubtargetInfo.inc"
@@ -33,9 +34,14 @@ public:
     return &FrameLowering;
   }
 
+  const DAArch34RegisterInfo *getRegisterInfo() const override {
+    return &RegInfo;
+  }
+
 private:
   DAArch34TargetLowering TLInfo;
   DAArch34FrameLowering FrameLowering;
+  DAArch34RegisterInfo RegInfo;
 };
 
 } // end namespace llvm
