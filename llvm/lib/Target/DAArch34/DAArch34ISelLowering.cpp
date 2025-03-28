@@ -13,8 +13,6 @@
 #include "DAArch34Subtarget.h"
 
 #define GET_REGINFO_ENUM
-#define GET_REGINFO_HEADER
-#define GET_REGINFO_TARGET_DESC // for DAArch34::GPRRegClass
 #include "DAArch34GenRegisterInfo.inc"
 
 #define DEBUG_TYPE "daarch34-lower"
