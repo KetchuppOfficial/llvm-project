@@ -4,9 +4,11 @@
 #include <string>
 
 #include "llvm/ADT/StringRef.h"
+#include "llvm/CodeGen/SelectionDAGTargetInfo.h"
 
 #include "DAArch34FrameLowering.h"
 #include "DAArch34ISelLowering.h"
+#include "DAArch34InstrInfo.h"
 #include "DAArch34RegisterInfo.h"
 
 #define GET_SUBTARGETINFO_HEADER // for DAArch34GenSubtargetInfo
@@ -38,10 +40,18 @@ public:
     return &RegInfo;
   }
 
+  const DAArch34InstrInfo *getInstrInfo() const override { return &InstrInfo; }
+
+  const SelectionDAGTargetInfo *getSelectionDAGInfo() const override {
+    return &TSInfo;
+  }
+
 private:
   DAArch34TargetLowering TLInfo;
   DAArch34FrameLowering FrameLowering;
   DAArch34RegisterInfo RegInfo;
+  DAArch34InstrInfo InstrInfo;
+  SelectionDAGTargetInfo TSInfo;
 };
 
 } // end namespace llvm

@@ -12,7 +12,7 @@ DAArch34Subtarget::DAArch34Subtarget(const TargetMachine &TM, const Triple &TT,
                                      const std::string &CPU,
                                      const std::string &FS)
     : DAArch34GenSubtargetInfo(TT, CPU, CPU /* TunCPU */, FS),
-      TLInfo(TM, *this), FrameLowering(*this) {}
+      TLInfo(TM, *this), FrameLowering(*this), InstrInfo() {}
 
 
 } // end namespace llvm
