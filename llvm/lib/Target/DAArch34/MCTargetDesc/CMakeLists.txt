@@ -3,6 +3,7 @@ add_llvm_component_library(LLVMDAArch34Desc
     DAArch34MCAsmInfo.cpp
     DAArch34InstPrinter.cpp
     DAArch34MCCodeEmitter.cpp
+    DAArch34AsmBackend.cpp
 
 LINK_COMPONENTS
     MC

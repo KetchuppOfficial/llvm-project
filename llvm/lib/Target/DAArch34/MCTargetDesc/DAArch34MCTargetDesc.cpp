@@ -3,6 +3,7 @@
 #include "llvm/MC/MCRegisterInfo.h"
 #include "llvm/MC/TargetRegistry.h"
 
+#include "DAArch34AsmBackend.h"
 #include "DAArch34InstPrinter.h"
 #include "DAArch34MCAsmInfo.h"
 #include "DAArch34MCCodeEmitter.h"
@@ -69,8 +70,11 @@ extern "C" void LLVMInitializeDAArch34TargetMC() {
   TargetRegistry::RegisterMCSubtargetInfo(TheDAArch34Target,
                                           createDAArch34MCSubtargetInfo);
   TargetRegistry::RegisterMCAsmInfo(TheDAArch34Target, createDAArch34MCAsmInfo);
-  TargetRegistry::RegisterMCInstPrinter(TheDAArch34Target, createDAArch34MCInstPrinter);
-  TargetRegistry::RegisterMCCodeEmitter(TheDAArch34Target, createDAArch34MCCodeEmitter);
+  TargetRegistry::RegisterMCInstPrinter(TheDAArch34Target,
+                                        createDAArch34MCInstPrinter);
+  TargetRegistry::RegisterMCCodeEmitter(TheDAArch34Target,
+                                        createDAArch34MCCodeEmitter);
+  TargetRegistry::RegisterMCAsmBackend(TheDAArch34Target, createDAArch34AsmBackend);
 }
 
 } // end namespace llvm
