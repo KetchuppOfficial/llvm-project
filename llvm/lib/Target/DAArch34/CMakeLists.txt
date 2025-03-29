@@ -7,6 +7,7 @@ tablegen(LLVM DAArch34GenSubtargetInfo.inc -gen-subtarget)
 tablegen(LLVM DAArch34GenMCPseudoLowering.inc -gen-pseudo-lowering)
 tablegen(LLVM DAArch34GenDAGISel.inc -gen-dag-isel)
 tablegen(LLVM DAArch34GenCallingConv.inc -gen-callingconv)
+tablegen(LLVM DAArch34GenAsmWriter.inc -gen-asm-writer)
 add_public_tablegen_target(DAArch34CommonTableGen)
 
 add_llvm_target(DAArch34CodeGen

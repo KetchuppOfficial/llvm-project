@@ -54,7 +54,7 @@ MCInstPrinter *createDAArch34MCInstPrinter(const Triple &TT,
                                            const MCAsmInfo &MAI,
                                            const MCInstrInfo &MII,
                                            const MCRegisterInfo &MRI) {
-  return new DAArch34InstrPrinter(MAI, MII, MRI);
+  return new DAArch34InstPrinter(MAI, MII, MRI);
 }
 
 } // end unnamed namespace
