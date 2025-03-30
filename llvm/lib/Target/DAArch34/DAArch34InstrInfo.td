@@ -10,7 +10,7 @@ class SImmAsmOperand<int Width> : AsmOperandClass {
 
 def simm16 : Operand<i32>, ImmLeaf<i32, [{ return isInt<16>(Imm); }]> {
     let ParserMatchClass = SImmAsmOperand<16>;
-    let EncoderMethod = "getImmOpValue";
+    let EncoderMethod = "getSImm16OpValue";
     let DecoderMethod = "decodeSImmOperand<16>";
     let MCOperandPredicate = [{
         if (int64_t Imm; MCOp.evaluateAsConstantImm(Imm))
@@ -21,8 +21,6 @@ def simm16 : Operand<i32>, ImmLeaf<i32, [{ return isInt<16>(Imm); }]> {
     let OperandNamespace = "DAArch34Op";
 }
 
-// Setting opcodes to 0x0 is a temporary stub
-
 // "brind" stands for "branch indirect". It's a def of SDNode (see TargetSelectionDAG.td)
 let hasSideEffects = false,
     mayLoad = false,
@@ -31,8 +29,10 @@ let hasSideEffects = false,
     isBranch = true,
     isIndirectBranch = true,
     isBarrier = true,
-    isTerminator = true in
-def BR : DAArch34Instr<0x0, (outs), (ins GPR:$rs1), "br $rs1", [(brind GPR:$rs1)]>;
+    isTerminator = true,
+    rd = 0,
+    rs2_or_imm = 0 in
+def BR : DAArch34Instr<0x2, (outs), (ins GPR:$rs1), "br $rs1", [(brind GPR:$rs1)]>;
 
 def daarch34_ret
     : SDNode<"DAArch34ISD::RET", // opcode
@@ -50,6 +50,7 @@ def PseudoRET : DAArch34PseudoInstr<(outs), (ins), "# pseudo ret", [(daarch34_re
 
 let isAsCheapAsAMove = true,
     isCodeGenOnly = true,
-    isReMaterializable = true in
-def MOVLI : DAArch34Instr<0x0, (outs GPR:$rd), (ins simm16:$imm), "li $rd, $imm",
-                         [(set GPR:$rd, simm16:$imm)]>;
+    isReMaterializable = true,
+    rs1 = 0 in
+def LI : DAArch34Instr<0x1, (outs GPR:$rd), (ins simm16:$rs2_or_imm), "li $rd, $rs2_or_imm",
+                      [(set GPR:$rd, simm16:$rs2_or_imm)]>;
