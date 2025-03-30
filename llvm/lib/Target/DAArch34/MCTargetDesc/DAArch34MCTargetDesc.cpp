@@ -51,14 +51,6 @@ MCAsmInfo *createDAArch34MCAsmInfo(const MCRegisterInfo &MRI, const Triple &TT,
   return MAI;
 }
 
-MCInstPrinter *createDAArch34MCInstPrinter(const Triple &TT,
-                                           unsigned SyntaxVariant,
-                                           const MCAsmInfo &MAI,
-                                           const MCInstrInfo &MII,
-                                           const MCRegisterInfo &MRI) {
-  return new DAArch34InstPrinter(MAI, MII, MRI);
-}
-
 } // end unnamed namespace
 
 extern "C" void LLVMInitializeDAArch34TargetMC() {
