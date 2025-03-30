@@ -4,6 +4,7 @@ add_llvm_component_library(LLVMDAArch34Desc
     DAArch34InstPrinter.cpp
     DAArch34MCCodeEmitter.cpp
     DAArch34AsmBackend.cpp
+    DAArch34ELFObjectWriter.cpp
 
 LINK_COMPONENTS
     MC

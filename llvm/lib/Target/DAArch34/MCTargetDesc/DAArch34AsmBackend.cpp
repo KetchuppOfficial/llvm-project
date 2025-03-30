@@ -4,6 +4,7 @@
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/bit.h"
 #include "llvm/MC/MCAsmBackend.h"
+#include "llvm/MC/MCELFObjectWriter.h"
 #include "llvm/MC/MCObjectWriter.h"
 #include "llvm/MC/MCSubtargetInfo.h"
 #include "llvm/Support/EndianStream.h"
@@ -11,6 +12,7 @@
 #include "llvm/TargetParser/Triple.h"
 
 #include "DAArch34AsmBackend.h"
+#include "DAArch34ELFObjectWriter.h"
 
 namespace llvm {
 
@@ -61,7 +63,8 @@ public:
 
   std::unique_ptr<MCObjectTargetWriter>
   createObjectTargetWriter() const override {
-    return std::unique_ptr<MCObjectTargetWriter>{};
+    return createDAArch34ELFObjectWriter(
+        false, MCELFObjectTargetWriter::getOSABI(OSType));
   }
 
 private:
