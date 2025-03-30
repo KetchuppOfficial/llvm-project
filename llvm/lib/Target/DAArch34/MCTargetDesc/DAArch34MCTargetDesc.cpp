@@ -5,6 +5,7 @@
 
 #include "DAArch34InstPrinter.h"
 #include "DAArch34MCAsmInfo.h"
+#include "DAArch34MCCodeEmitter.h"
 #include "TargetInfo/DAArch34TargetInfo.h"
 
 #define GET_REGINFO_ENUM    // for enum of registers
@@ -69,6 +70,7 @@ extern "C" void LLVMInitializeDAArch34TargetMC() {
                                           createDAArch34MCSubtargetInfo);
   TargetRegistry::RegisterMCAsmInfo(TheDAArch34Target, createDAArch34MCAsmInfo);
   TargetRegistry::RegisterMCInstPrinter(TheDAArch34Target, createDAArch34MCInstPrinter);
+  TargetRegistry::RegisterMCCodeEmitter(TheDAArch34Target, createDAArch34MCCodeEmitter);
 }
 
 } // end namespace llvm

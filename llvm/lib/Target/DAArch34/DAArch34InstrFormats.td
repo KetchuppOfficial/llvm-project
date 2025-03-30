@@ -10,16 +10,16 @@ class DAArch34Instr<bits<6> Op, dag Outs, dag Ins, string Asm, list<dag> pattern
 
     let Size = 4;
 
-    field bits<32> Instr;
+    field bits<32> Inst;
 
     bits<5> rd = 0;
     bits<5> rs1 = 0;
     bits<16> rs2_or_imm = 0;
 
-    let Instr{5-0} = Op;
-    let Instr{6-10} = rd;
-    let Instr{11-15} = rs1;
-    let Instr{16-31} = rs2_or_imm;
+    let Inst{5-0} = Op;
+    let Inst{6-10} = rd;
+    let Inst{11-15} = rs1;
+    let Inst{16-31} = rs2_or_imm;
 }
 
 class DAArch34PseudoInstr<dag Outs, dag Ins, string Asm, list<dag> Pattern>
