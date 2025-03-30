@@ -8,6 +8,7 @@
 #include "llvm/MC/TargetRegistry.h" // for RegisterAsmPrinter
 #include "llvm/Target/TargetMachine.h"
 
+#include "DAArch34InstLower.h"
 #include "TargetInfo/DAArch34TargetInfo.h" // for getTheDAArch34Target
 
 #define GET_INSTRINFO_ENUM // for enum with instructions
@@ -40,6 +41,10 @@ public:
   bool emitPseudoExpansionLowering(MCStreamer &OutStreamer,
                                    const MachineInstr *MI);
 
+  bool lowerOperand(const MachineOperand &MO, MCOperand &MCOp) const {
+    return lowerDAArch34MachineOperandToMCOperand(MO, MCOp, *this);
+  }
+
 private:
   const MCSubtargetInfo *STI;
 };
@@ -47,7 +52,13 @@ private:
 #include "DAArch34GenMCPseudoLowering.inc"
 
 void DAArch34AsmPrinter::emitInstruction(const MachineInstr *MI) {
-  emitPseudoExpansionLowering(*OutStreamer, MI);
+  if (emitPseudoExpansionLowering(*OutStreamer, MI)) {
+    return;
+  }
+
+  if (MCInst TmpInst; !lowerDAArch34MachineInstrToMCInst(MI, TmpInst, *this)) {
+    EmitToStreamer(*OutStreamer, TmpInst);
+  }
 }
 
 } // end anonymous namespace
