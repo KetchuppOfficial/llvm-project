@@ -32,7 +32,8 @@ let hasSideEffects = false,
     isTerminator = true,
     rd = 0,
     rs2_or_imm = 0 in
-def BR : DAArch34Instr<0x2, (outs), (ins GPR:$rs1), "br $rs1", [(brind GPR:$rs1)]>;
+def BR : DAArch34Instr<0x2, (outs), (ins GPRExceptZero:$rs1), "br $rs1",
+                       [(brind GPRExceptZero:$rs1)]>;
 
 def daarch34_ret
     : SDNode<"DAArch34ISD::RET", // opcode
@@ -46,11 +47,39 @@ let isBarrier = true,
     isReturn = true,
     isTerminator = true in
 def PseudoRET : DAArch34PseudoInstr<(outs), (ins), "# pseudo ret", [(daarch34_ret)]>,
-                PseudoInstExpansion<(BR D0)>;
+                PseudoInstExpansion<(BR D10)>;
 
 let isAsCheapAsAMove = true,
     isCodeGenOnly = true,
     isReMaterializable = true,
     rs1 = 0 in
-def LI : DAArch34Instr<0x1, (outs GPR:$rd), (ins simm16:$rs2_or_imm), "li $rd, $rs2_or_imm",
-                      [(set GPR:$rd, simm16:$rs2_or_imm)]>;
+def LI : DAArch34Instr<0x1, (outs GPRExceptZero:$rd), (ins simm16:$rs2_or_imm),
+                       "li $rd, $rs2_or_imm", [(set GPRExceptZero:$rd, simm16:$rs2_or_imm)]>;
+
+let isAsCheapAsAMove = true,
+    isReMaterializable = true,
+    hasSideEffects = false,
+    mayLoad = false,
+    mayStore = false,
+    rs2_or_imm = 0 in
+def MOV : DAArch34Instr<0x2, (outs GPRExceptZero:$rd), (ins GPR:$rs1), "mov $rd, $rs1",
+                        [(set GPRExceptZero:$rd, GPR:$rs1)]>;
+
+let rd = 0 in
+def putPixel : DAArch34Instr<0x3D, (outs), (ins GPR:$rs1, GPR:$rs2_or_imm),
+                             "putPixel $rs1, $rs2_or_imm",
+                             [(int_daarch34_put_pixel GPR:$rs1, GPR:$rs2_or_imm)]>;
+
+def setColor : DAArch34Instr<0x3E, (outs), (ins GPR:$rd, GPR:$rs1, GPR:$rs2_or_imm),
+                             "setColor $rd, $rs1, $rs2_or_imm",
+                             [(int_daarch34_set_color GPR:$rd, GPR:$rs1, GPR:$rs2_or_imm)]>;
+
+let rd = 0,
+    rs1 = 0,
+    rs2_or_imm = 0 in
+def updateScreen : DAArch34Instr<0x3F, (outs), (ins), "updateScreen",
+                                 [(int_daarch34_update_screen)]>;
+
+def Rand : DAArch34PseudoInstr<(outs GPRExceptZero:$rd), (ins), "# pseudo Rand",
+                               [(set GPRExceptZero:$rd, (int_daarch34_rand))]>,
+           PseudoInstExpansion<(MOV GPRExceptZero:$rd, D0)>;

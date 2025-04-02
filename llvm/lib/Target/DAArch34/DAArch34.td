@@ -1,5 +1,4 @@
 include "llvm/Target/Target.td"
-// include "clang/AST/PropertiesBase.td"
 
 include "DAArch34RegisterInfo.td"
 include "DAArch34InstrInfo.td"

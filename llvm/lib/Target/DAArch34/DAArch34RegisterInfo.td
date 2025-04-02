@@ -12,6 +12,10 @@ foreach I = 0-31 in {
     def D#I : DAArch34Reg<I, "D"#I>;
 }
 
-def GPR : RegisterClass<"DAArch34", [i32], 32, (add (sequence "D%u", 0, 31))>;
+class DAArch34RegisterClass<dag regList> : RegisterClass<"DAArch34", [i32], 32, regList>;
+
+def GPR : DAArch34RegisterClass<(add (sequence "D%u", 0, 31))>;
+
+def GPRExceptZero : DAArch34RegisterClass<(add (sequence "D%u", 1, 31))>;
 
 #endif // DAARCH_REGISTER_INFO_TD
