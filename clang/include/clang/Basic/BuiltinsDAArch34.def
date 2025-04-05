@@ -1,0 +1,6 @@
+// look at clang/include/clang/Basic/Builtins.def for explanation
+
+BUILTIN(putPixel, "vSiSi", "nc")
+BUILTIN(setColor, "vSiSiSi", "nc")
+BUILTIN(updateScreen, "v", "nc")
+BUILTIN(Rand, "Si", "nc")
