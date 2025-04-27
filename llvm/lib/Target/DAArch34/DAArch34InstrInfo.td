@@ -63,6 +63,21 @@ def BNE : DAArch34BrCond<0x3, SETNE, "bne">;
 def BLT : DAArch34BrCond<0x4, SETLT, "blt">;
 def BGE : DAArch34BrCond<0x5, SETGE, "bge">;
 
+
+let hasSideEffects = false,
+    mayLoad = false,
+    mayStore = true in
+def ST : DAArch34Instr<0x6, (outs), (ins GPR:$rs1, GPRExceptZero:$rd, simm16:$rs2_or_imm),
+                       "st $rs1, [$rd, $rs2_or_imm]", []>;
+
+def AddrRegImm : ComplexPattern<iPTR, // type of return value
+                                2, // the number of operands
+                                "SelectAddrRegImm">; // function used for pattern matching
+
+def : Pat<(store (i32 GPR:$rs1), (AddrRegImm (i32 GPRExceptZero:$rd), simm16:$rs2_or_imm)),
+          (ST GPR:$rs1, GPRExceptZero:$rd, simm16:$rs2_or_imm)>;
+
+
 // "brind" stands for "branch indirect". It's a def of SDNode (see TargetSelectionDAG.td)
 let hasSideEffects = false,
     mayLoad = false,
@@ -74,7 +89,7 @@ let hasSideEffects = false,
     isTerminator = true,
     rd = 0,
     rs2_or_imm = 0 in
-def BR : DAArch34Instr<0x6, (outs), (ins GPRExceptZero:$rs1), "br $rs1",
+def BR : DAArch34Instr<0x7, (outs), (ins GPRExceptZero:$rs1), "br $rs1",
                        [(brind GPRExceptZero:$rs1)]>;
 
 def daarch34_ret
@@ -95,7 +110,7 @@ let isAsCheapAsAMove = true,
     isCodeGenOnly = true,
     isReMaterializable = true,
     rs1 = 0 in
-def LI : DAArch34Instr<0x7, (outs GPRExceptZero:$rd), (ins simm16:$rs2_or_imm),
+def LI : DAArch34Instr<0x8, (outs GPRExceptZero:$rd), (ins simm16:$rs2_or_imm),
                        "li $rd, $rs2_or_imm", [(set GPRExceptZero:$rd, simm16:$rs2_or_imm)]>;
 
 let isAsCheapAsAMove = true,
@@ -104,7 +119,7 @@ let isAsCheapAsAMove = true,
     mayLoad = false,
     mayStore = false,
     rs2_or_imm = 0 in
-def MOV : DAArch34Instr<0x8, (outs GPRExceptZero:$rd), (ins GPR:$rs1), "mov $rd, $rs1",
+def MOV : DAArch34Instr<0x9, (outs GPRExceptZero:$rd), (ins GPR:$rs1), "mov $rd, $rs1",
                         [(set GPRExceptZero:$rd, GPR:$rs1)]>;
 
 let rd = 0 in

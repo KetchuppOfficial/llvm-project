@@ -20,14 +20,52 @@ namespace llvm {
 namespace {
 
 class DAArch34DagToDagISel : public SelectionDAGISel {
+  const DAArch34Subtarget *Subtarget = nullptr;
+
 public:
   static char ID;
+
   explicit DAArch34DagToDagISel(DAArch34TargetMachine &TM,
                                 CodeGenOptLevel OptLevel)
       : SelectionDAGISel(TM, OptLevel) {}
 
   bool runOnMachineFunction(MachineFunction &MF) override {
+    Subtarget = &MF.getSubtarget<DAArch34Subtarget>();
     return SelectionDAGISel::runOnMachineFunction(MF);
+  }
+
+  bool SelectAddrFrameIndex(SDValue Addr, SDValue &Base, SDValue &Offset) {
+    if (auto *FIN = dyn_cast<FrameIndexSDNode>(Addr)) {
+      Base = CurDAG->getTargetFrameIndex(FIN->getIndex(), MVT::i32);
+      Offset = CurDAG->getTargetConstant(0, SDLoc(Addr), MVT::i32);
+      return true;
+    }
+
+    return false;
+  }
+
+  bool SelectAddrRegImm(SDValue Addr, SDValue &Base, SDValue &Offset) {
+    if (SelectAddrFrameIndex(Addr, Base, Offset))
+      return true;
+
+    MVT VT = Addr.getSimpleValueType();
+
+    // checks that Addr is an add-like operation with operand 1 being a constant
+    if (CurDAG->isBaseWithConstantOffset(Addr)) {
+      const int64_t CVal =
+          cast<ConstantSDNode>(Addr.getOperand(1))->getSExtValue();
+      if (isInt<16>(CVal)) {
+        Base = Addr.getOperand(0);
+        if (auto *FIN = dyn_cast<FrameIndexSDNode>(Base))
+          Base = CurDAG->getTargetFrameIndex(FIN->getIndex(), VT);
+        Offset = CurDAG->getTargetConstant(CVal, SDLoc{Addr}, VT);
+        return true;
+      }
+    }
+
+    Base = Addr;
+    Offset = CurDAG->getTargetConstant(0, SDLoc{Addr}, VT);
+    return true;
   }
 
   void Select(SDNode *Node) override;
