@@ -21,6 +21,48 @@ def simm16 : Operand<i32>, ImmLeaf<i32, [{ return isInt<16>(Imm); }]> {
     let OperandNamespace = "DAArch34Op";
 }
 
+def btarget16 : Operand<OtherVT> {
+    let ParserMatchClass = SImmAsmOperand<16>;
+    let EncoderMethod = "getBranchTarget16OpValue";
+    let DecoderMethod = "decodeSImmOperand<16>";
+    let MCOperandPredicate = [{
+        if (int64_t Imm; MCOp.evaluateAsConstantImm(Imm))
+            return isInt<16>(Imm);
+        return MCOp.isBareSymbolRef();
+    }];
+    let OperandType = "OPERAND_PCREL";
+    let PrintMethod = "printBranchOperand";
+}
+
+let hasSideEffects = false,
+    mayLoad = false,
+    mayStore = false,
+    isBarrier = true,
+    isBranch = true,
+    isTerminator = true,
+    rd = 0,
+    rs1 = 0 in
+def B : DAArch34Instr<0x1, (outs), (ins btarget16:$rs2_or_imm), "b $rs2_or_imm",
+                      [(br bb:$rs2_or_imm)]>;
+
+let hasSideEffects = false,
+    mayLoad = false,
+    mayStore = false,
+    isBarrier = true,
+    isBranch = true,
+    isTerminator = true in
+class DAArch34BrCond<int Opcode, CondCode cc, string Name>
+    : DAArch34Instr<Opcode,
+                    (outs),
+                    (ins GPRExceptZero:$rd, GPRExceptZero:$rs1, btarget16:$rs2_or_imm),
+                    Name # " $rd, $rs1, $rs2_or_imm",
+                    [(brcc cc, GPRExceptZero:$rd, GPRExceptZero:$rs1, bb:$rs2_or_imm)]>;
+
+def BEQ : DAArch34BrCond<0x2, SETEQ, "beq">;
+def BNE : DAArch34BrCond<0x3, SETNE, "bne">;
+def BLT : DAArch34BrCond<0x4, SETLT, "blt">;
+def BGE : DAArch34BrCond<0x5, SETGE, "bge">;
+
 // "brind" stands for "branch indirect". It's a def of SDNode (see TargetSelectionDAG.td)
 let hasSideEffects = false,
     mayLoad = false,
@@ -32,7 +74,7 @@ let hasSideEffects = false,
     isTerminator = true,
     rd = 0,
     rs2_or_imm = 0 in
-def BR : DAArch34Instr<0x2, (outs), (ins GPRExceptZero:$rs1), "br $rs1",
+def BR : DAArch34Instr<0x6, (outs), (ins GPRExceptZero:$rs1), "br $rs1",
                        [(brind GPRExceptZero:$rs1)]>;
 
 def daarch34_ret
@@ -53,7 +95,7 @@ let isAsCheapAsAMove = true,
     isCodeGenOnly = true,
     isReMaterializable = true,
     rs1 = 0 in
-def LI : DAArch34Instr<0x1, (outs GPRExceptZero:$rd), (ins simm16:$rs2_or_imm),
+def LI : DAArch34Instr<0x7, (outs GPRExceptZero:$rd), (ins simm16:$rs2_or_imm),
                        "li $rd, $rs2_or_imm", [(set GPRExceptZero:$rd, simm16:$rs2_or_imm)]>;
 
 let isAsCheapAsAMove = true,
@@ -62,7 +104,7 @@ let isAsCheapAsAMove = true,
     mayLoad = false,
     mayStore = false,
     rs2_or_imm = 0 in
-def MOV : DAArch34Instr<0x2, (outs GPRExceptZero:$rd), (ins GPR:$rs1), "mov $rd, $rs1",
+def MOV : DAArch34Instr<0x8, (outs GPRExceptZero:$rd), (ins GPR:$rs1), "mov $rd, $rs1",
                         [(set GPRExceptZero:$rd, GPR:$rs1)]>;
 
 let rd = 0 in

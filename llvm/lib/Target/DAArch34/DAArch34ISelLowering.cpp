@@ -35,13 +35,10 @@ DAArch34TargetLowering::DAArch34TargetLowering(const TargetMachine &TM,
   }
 
   for (auto Op : {ISD::ADD, ISD::MUL, ISD::LOAD, ISD::STORE, ISD::Constant,
-                  ISD::UNDEF, ISD::FRAMEADDR}) {
+                  ISD::UNDEF, ISD::FRAMEADDR, ISD::BR_CC}) {
     // The target natively supports this operation.
     setOperationAction(Op, MVT::i32, LegalizeAction::Legal);
   }
-
-  // Use the LowerOperation hook to implement custom lowering.
-  setOperationAction(ISD::BR_CC, MVT::i32, LegalizeAction::Custom);
 }
 
 const char *DAArch34TargetLowering::getTargetNodeName(unsigned Opcode) const {
