@@ -78,6 +78,43 @@ def : Pat<(store (i32 GPR:$rs1), (AddrRegImm (i32 GPRExceptZero:$rd), simm16:$rs
           (ST GPR:$rs1, GPRExceptZero:$rd, simm16:$rs2_or_imm)>;
 
 
+let hasSideEffects = false,
+    mayLoad = false,
+    mayStore = false in
+multiclass DAArch34Arithmetic<bits<6> Opcode, SDPatternOperator Op> {
+    def NAME :
+        DAArch34Instr<Opcode, (outs GPRExceptZero:$rd),
+                      (ins GPR:$rs1, GPRExceptZero:$rs2_or_imm),
+                      NAME # " $rd, $rs1, $rs2_or_imm",
+                      [(set GPRExceptZero:$rd, (Op GPR:$rs1, GPRExceptZero:$rs2_or_imm))]>;
+    def NAME#I :
+        DAArch34Instr<!add(Opcode, 0x1), (outs GPRExceptZero:$rd),
+                      (ins GPR:$rs1, simm16:$rs2_or_imm),
+                      NAME # " $rd, $rs1, $rs2_or_imm",
+                      [(set GPRExceptZero:$rd, (Op GPR:$rs1, simm16:$rs2_or_imm))]>;
+}
+
+defm ADD : DAArch34Arithmetic<0x7, add>;
+defm SUB : DAArch34Arithmetic<0x9, sub>;
+defm MUL : DAArch34Arithmetic<0xB, mul>;
+defm SDIV : DAArch34Arithmetic<0xD, sdiv>;
+defm SREM : DAArch34Arithmetic<0xF, srem>;
+
+
+let hasSideEffects = false,
+    mayLoad = false,
+    mayStore = false in
+class DAArch34Shifts<bits<6> Opcode, SDPatternOperator Op>
+    : DAArch34Instr<Opcode, (outs GPRExceptZero:$rd),
+                            (ins GPR:$rs1, simm16:$rs2_or_imm),
+                            NAME # " $rd, $rs1, $rs2_or_imm",
+                            [(set GPRExceptZero:$rd, (Op GPR:$rs1, simm16:$rs2_or_imm))]>;
+
+def SRL : DAArch34Shifts<0x11 , srl>;
+def SRA : DAArch34Shifts<0x12 , sra>;
+def SHL : DAArch34Shifts<0x13 , shl>;
+
+
 // "brind" stands for "branch indirect". It's a def of SDNode (see TargetSelectionDAG.td)
 let hasSideEffects = false,
     mayLoad = false,
@@ -89,7 +126,7 @@ let hasSideEffects = false,
     isTerminator = true,
     rd = 0,
     rs2_or_imm = 0 in
-def BR : DAArch34Instr<0x7, (outs), (ins GPRExceptZero:$rs1), "br $rs1",
+def BR : DAArch34Instr<0x14, (outs), (ins GPRExceptZero:$rs1), "br $rs1",
                        [(brind GPRExceptZero:$rs1)]>;
 
 def daarch34_ret
@@ -106,12 +143,14 @@ let isBarrier = true,
 def PseudoRET : DAArch34PseudoInstr<(outs), (ins), "# pseudo ret", [(daarch34_ret)]>,
                 PseudoInstExpansion<(BR D10)>;
 
+
 let isAsCheapAsAMove = true,
     isCodeGenOnly = true,
     isReMaterializable = true,
     rs1 = 0 in
-def LI : DAArch34Instr<0x8, (outs GPRExceptZero:$rd), (ins simm16:$rs2_or_imm),
+def LI : DAArch34Instr<0x15, (outs GPRExceptZero:$rd), (ins simm16:$rs2_or_imm),
                        "li $rd, $rs2_or_imm", [(set GPRExceptZero:$rd, simm16:$rs2_or_imm)]>;
+
 
 let isAsCheapAsAMove = true,
     isReMaterializable = true,
@@ -119,8 +158,9 @@ let isAsCheapAsAMove = true,
     mayLoad = false,
     mayStore = false,
     rs2_or_imm = 0 in
-def MOV : DAArch34Instr<0x9, (outs GPRExceptZero:$rd), (ins GPR:$rs1), "mov $rd, $rs1",
+def MOV : DAArch34Instr<0x16, (outs GPRExceptZero:$rd), (ins GPR:$rs1), "mov $rd, $rs1",
                         [(set GPRExceptZero:$rd, GPR:$rs1)]>;
+
 
 let rd = 0 in
 def putPixel : DAArch34Instr<0x3D, (outs), (ins GPR:$rs1, GPR:$rs2_or_imm),

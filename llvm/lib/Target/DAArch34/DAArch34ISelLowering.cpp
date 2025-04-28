@@ -34,7 +34,8 @@ DAArch34TargetLowering::DAArch34TargetLowering(const TargetMachine &TM,
     setOperationAction(Opc, MVT::i32, LegalizeAction::Expand);
   }
 
-  for (auto Op : {ISD::ADD, ISD::MUL, ISD::LOAD, ISD::STORE, ISD::Constant,
+  for (auto Op : {ISD::ADD, ISD::SUB, ISD::MUL, ISD::SDIV, ISD::SREM, ISD::SRL,
+                  ISD::SRA, ISD::SHL, ISD::LOAD, ISD::STORE, ISD::Constant,
                   ISD::UNDEF, ISD::FRAMEADDR, ISD::BR_CC}) {
     // The target natively supports this operation.
     setOperationAction(Op, MVT::i32, LegalizeAction::Legal);
