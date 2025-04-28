@@ -13,7 +13,7 @@
 
 #include "DAArch34ISelLowering.h"
 
-#define DEBUG_TYPE "sim-isel"
+#define DEBUG_TYPE "daarch34-isel"
 
 namespace llvm {
 
